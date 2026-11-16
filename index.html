@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0e5a6b">
+<title>Finance Daily</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#f4f6f8; --surface:#ffffff; --fg:#17212b; --muted:#5d6b78; --line:#d9e0e6;
+  --accent:#0e5a6b; --accent-fg:#ffffff; --accent-soft:#e1eff2;
+  --ok:#1d7a4a; --ok-soft:#e1f3e8; --bad:#b0352c; --bad-soft:#fbe7e4; --warn:#8a5a00; --warn-soft:#fff1c9;
+  --f-serif:'Newsreader',Georgia,serif; --f-sans:'IBM Plex Sans',system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#10171d; --surface:#18222b; --fg:#e6edf2; --muted:#93a3b1; --line:#2b3945;
+  --accent:#5cc0d4; --accent-fg:#0b1a20; --accent-soft:#183540;
+  --ok:#59c98a; --ok-soft:#173326; --bad:#f08178; --bad-soft:#3a1d1a; --warn:#ffd666; --warn-soft:#4a3a0c; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#10171d; --surface:#18222b; --fg:#e6edf2; --muted:#93a3b1; --line:#2b3945;
+  --accent:#5cc0d4; --accent-fg:#0b1a20; --accent-soft:#183540;
+  --ok:#59c98a; --ok-soft:#173326; --bad:#f08178; --bad-soft:#3a1d1a; --warn:#ffd666; --warn-soft:#4a3a0c; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.55 var(--f-sans);padding-inline:16px;padding-block:0 40px}
+.wrap{max-width:1220px;margin:0 auto}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:12px;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:10px 20px;align-items:center;justify-content:space-between}
+h1{font:600 20px/1.2 var(--f-serif);margin:0;letter-spacing:.2px}
+h1 small{display:block;font:500 11px var(--f-sans);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.stats{display:flex;gap:18px;align-items:center;flex-wrap:wrap;font-variant-numeric:tabular-nums}
+.stat{display:flex;flex-direction:column;line-height:1.15}
+.stat b{font:600 18px var(--f-sans)} .stat span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.stat.ok b{color:var(--ok)}
+.bar{height:4px;background:var(--line);border-radius:2px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .3s}
+.notice{margin:8px 0 0;font-size:12px;color:var(--muted);min-height:16px}
+.notice.warn{color:var(--bad)}
+main{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:24px;margin-top:16px;align-items:start}
+@media(max-width:860px){main{grid-template-columns:minmax(0,1fr)}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:22px}
+.qmeta{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px}
+.title{font:400 24px/1.35 var(--f-serif);margin:0 0 16px;text-wrap:pretty}
+h3.sec{font:600 11px var(--f-sans);letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin:18px 0 6px}
+ul.pts{margin:0;padding-left:20px} ul.pts li{margin:0 0 6px;max-width:70ch}
+p{margin:0 0 10px;max-width:70ch}
+.means{background:var(--accent-soft);border-radius:8px;padding:12px 14px;margin-top:6px;max-width:72ch}
+.means b{display:block;font:600 11px var(--f-sans);letter-spacing:.09em;text-transform:uppercase;color:var(--accent);margin-bottom:4px}
+.watch{margin-top:14px;color:var(--muted);max-width:70ch}
+.watch b{color:var(--fg)}
+.badge{font:600 11px var(--f-sans);text-transform:uppercase;letter-spacing:.06em;padding:3px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.badge.confirmed{color:var(--ok);background:var(--ok-soft);border-color:var(--ok)}
+.badge.reported{color:var(--accent);background:var(--accent-soft);border-color:var(--accent)}
+.badge.approx{color:var(--warn);background:var(--warn-soft);border-color:var(--warn)}
+.badge.check{color:var(--bad);background:var(--bad-soft);border-color:var(--bad)}
+.note{margin-top:12px;font-size:13px;color:var(--muted);border-left:3px solid var(--line);padding-left:10px;max-width:70ch}
+.cfa{margin-top:14px}
+.cfabox{margin-top:8px;border:1px dashed var(--line);border-radius:8px;padding:10px 12px;font-size:14px;max-width:72ch}
+.cfabox b{color:var(--accent)}
+.src{margin-top:14px;font-size:12px;color:var(--muted)}
+.src a{color:var(--accent)}
+.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:20px}
+button.primary{background:var(--accent);color:var(--accent-fg);border:0;border-radius:8px;padding:11px 24px;font:600 15px var(--f-sans);cursor:pointer}
+button.primary:disabled{opacity:.4;cursor:not-allowed}
+button.ghost{background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:8px;padding:10px 14px;font:500 13px var(--f-sans);cursor:pointer}
+button.ghost:hover:not(:disabled){color:var(--fg);border-color:var(--muted)}
+button.ghost:disabled{opacity:.4;cursor:default}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.mrow{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr) auto;gap:6px 14px;align-items:start;padding:10px 0;border-top:1px solid var(--line)}
+.mrow:first-of-type{border-top:0}
+.mrow .nm{font-weight:600} .mrow .vl{font-variant-numeric:tabular-nums} .mrow .ds{grid-column:1/-1;font-size:13px;color:var(--muted)}
+.term{padding:8px 0;border-top:1px solid var(--line)} .term:first-of-type{border-top:0}
+.legend{font-size:12px;color:var(--muted);margin-top:16px;display:flex;gap:10px;flex-wrap:wrap}
+.done h2{font:600 26px var(--f-serif);margin:0 0 4px} .done p{color:var(--muted)}
+aside .card{padding:16px;margin-bottom:16px}
+aside h2{font:600 13px var(--f-sans);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 10px}
+.rows{display:flex;flex-direction:column;gap:4px}
+.row{display:grid;grid-template-columns:24px minmax(0,1fr) 16px;gap:8px;align-items:center;text-align:left;background:var(--surface);color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:7px 8px;font:inherit;font-size:13px;cursor:pointer}
+.row:hover{border-color:var(--accent)}
+.row .n{font:600 12px var(--f-sans);color:var(--muted);text-align:center}
+.row .tt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .tt em{font-style:normal;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-right:6px}
+.row .ck{color:var(--ok);font-weight:700;visibility:hidden}
+.row.seen{background:var(--ok-soft);border-color:var(--ok)} .row.seen .ck{visibility:visible}
+.row.cur{outline:2px solid var(--accent);outline-offset:1px}
+.months,.grass{display:grid;grid-template-columns:repeat(22,minmax(0,1fr));gap:3px}
+.months{font-size:10px;color:var(--muted);height:14px;margin-bottom:3px} .months span{white-space:nowrap;overflow:visible}
+.grass{grid-template-rows:repeat(7,auto);grid-auto-flow:column}
+.g{display:block;width:100%;aspect-ratio:1;border-radius:3px;border:0;padding:0;background:color-mix(in srgb,var(--line) 75%,transparent)}
+.g.gx{background:transparent}
+.g1{background:color-mix(in srgb,var(--ok) 28%,var(--surface))} .g2{background:color-mix(in srgb,var(--ok) 50%,var(--surface))}
+.g3{background:color-mix(in srgb,var(--ok) 75%,var(--surface))} .g4{background:var(--ok)}
+.g.has{cursor:pointer;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--accent) 45%,transparent)}
+.g.now{outline:2px solid var(--accent);outline-offset:1px}
+.gl{display:flex;gap:4px;align-items:center;justify-content:flex-end;font-size:11px;color:var(--muted);margin-top:8px}
+.gl i{display:inline-block;width:11px;height:11px;border-radius:3px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:6px;padding:5px 9px;font:500 12px var(--f-sans);cursor:pointer}
+.chip:hover{border-color:var(--accent)} .chip.cur{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.tools{display:flex;flex-direction:column;gap:8px}
+.tools label{display:flex;gap:8px;align-items:center;font-size:13px}
+.tools input[type=time]{font:inherit;font-size:13px;padding:4px 6px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--fg)}
+.hint{font-size:12px;color:var(--muted);margin:0}
+textarea{width:100%;font-size:11px;background:var(--surface);color:var(--fg);border:1px solid var(--line);border-radius:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1><small>Daily news in simple English</small>Finance Daily</h1>
+  <div class="stats" aria-live="polite">
+    <div class="stat ok"><b id="sStreak">0</b><span>Day streak</span></div>
+    <div class="stat"><b id="sDays">0</b><span>Days read</span></div>
+    <div class="stat"><b id="sDone">0/0</b><span>This edition</span></div>
+  </div>
+</header>
+<div class="bar"><i id="bar"></i></div>
+<div id="notice" class="notice"></div>
+<main>
+  <section id="stage"></section>
+  <aside>
+    <div class="card"><h2>In this edition</h2><div class="rows" id="rows"></div></div>
+    <div class="card"><h2>Reading grass</h2><div class="months" id="months"></div><div class="grass" id="grass"></div>
+      <div class="gl">Less <i class="g"></i><i class="g1"></i><i class="g2"></i><i class="g3"></i><i class="g4"></i> More</div></div>
+    <div class="card"><h2>Past editions</h2><div class="chips" id="eds"></div></div>
+    <div class="card"><h2>Settings</h2><div class="tools">
+      <label><input type="checkbox" id="cRemind"> Daily reminder at <input type="time" id="tRemind" value="08:00"></label>
+      <p class="hint" id="rHint">Works while the browser is open, or when this site is installed as an app.</p>
+      <button class="ghost" id="bTest">Send a test notification</button>
+      <label><input type="checkbox" id="cCfa"> Always show CFA links</label>
+      <button class="ghost" id="bTheme">Switch theme</button>
+      <button class="ghost" id="bExport">Backup my progress</button>
+      <button class="ghost" id="bImport">Restore from backup</button>
+      <div id="bkBox"></div>
+    </div></div>
+  </aside>
+</main>
+</div>
+<script src="data/index.js"></script>
+<script>
+(function(){
+const LS='finance-daily-v1';
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const DEF={remind:false,time:'08:00',theme:'',cfa:false};
+let S={days:{},settings:Object.assign({},DEF),notified:''};
+try{const j=JSON.parse(localStorage.getItem(LS)||'null');if(j&&j.days){S=Object.assign(S,j);S.settings=Object.assign({},DEF,j.settings||{})}}catch(e){}
+function save(){try{localStorage.setItem(LS,JSON.stringify(S));return true}catch(e){return false}}
+const pad=n=>String(n).padStart(2,'0');
+const key=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const parse=k=>{const a=k.split('-').map(Number);return new Date(a[0],a[1]-1,a[2])};
+const fmt=(k,o)=>parse(k).toLocaleDateString('en-GB',o||{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+const INDEX=(window.FD_INDEX||[]).slice().sort();
+window.FD_DATA=window.FD_DATA||{};
+let V={date:null,p:0,ed:null,pages:[],cfaOpen:{}};
+
+function loadDay(k){
+  return new Promise((res,rej)=>{
+    if(FD_DATA[k])return res(FD_DATA[k]);
+    const s=document.createElement('script');s.src='data/'+k+'.js?'+Date.now();
+    s.onload=()=>FD_DATA[k]?res(FD_DATA[k]):rej();s.onerror=rej;document.head.appendChild(s);
+  });
+}
+function pagesOf(ed){
+  const p=[{t:'brief',tag:'Brief',label:'Today in 60 seconds'}];
+  ed.stories.forEach((s,i)=>p.push({t:'story',i:i,tag:s.tag,label:s.title}));
+  p.push({t:'markets',tag:'Markets',label:'Markets at a glance'});
+  p.push({t:'words',tag:'Next',label:'Words to know and what to watch'});
+  return p;
+}
+function rec(k){return S.days[k]}
+function seenCount(k){const r=rec(k);return r?r.seen.length:0}
+function isRead(k){const r=rec(k);return !!(r&&r.total&&r.seen.length>=r.total)}
+function markSeen(k,p,total){
+  const r=S.days[k]||(S.days[k]={seen:[],total:total});
+  r.total=total;if(r.seen.indexOf(p)<0)r.seen.push(p);save();
+}
+function streak(){
+  let n=0;const d=new Date();d.setHours(0,0,0,0);
+  if(!isRead(key(d)))d.setDate(d.getDate()-1);
+  while(isRead(key(d))){n++;d.setDate(d.getDate()-1)}
+  return n;
+}
+const badgeTxt={confirmed:'Confirmed',reported:'Reported',approx:'Approx',check:'Check'};
+const badgeTip={confirmed:'From an official source',reported:'From news reports',approx:'Number is approximate',check:'Sources disagree or a detail is unconfirmed'};
+function badge(c){return c?`<span class="badge ${esc(c)}" title="${esc(badgeTip[c]||'')}">${esc(badgeTxt[c]||c)}</span>`:''}
+function srcLinks(a){
+  if(!a||!a.length)return '';
+  return '<div class="src">Sources: '+a.map(x=>x.u?`<a href="${esc(x.u)}" target="_blank" rel="noopener">${esc(x.n)}</a>`:esc(x.n)).join(', ')+'</div>';
+}
+function pageHtml(){
+  const ed=V.ed,pg=V.pages[V.p],total=V.pages.length;
+  const meta=(l,r)=>`<div class="qmeta"><span>${l}</span><span>${r||''}</span></div>`;
+  if(V.p>=total){
+    const s=streak();
+    return `<div class="card done"><h2>Done for today</h2><p>You finished the ${esc(fmt(V.date,{day:'numeric',month:'long'}))} edition. Day streak: ${s}.</p>
+    <div class="actions"><button class="ghost" id="bBack">Back to the start</button></div></div>`;
+  }
+  let h='';
+  if(pg.t==='brief'){
+    h=meta('Today in 60 seconds',esc(fmt(V.date,{weekday:'long',day:'numeric',month:'long'})))+
+      `<h2 class="title">${esc(ed.headline||'What happened in the markets')}</h2>`+
+      (ed.note?`<p class="watch">${esc(ed.note)}</p>`:'')+
+      `<ul class="pts">${ed.brief.bullets.map(b=>`<li>${esc(b)}</li>`).join('')}</ul>`+
+      `<div class="means"><b>The big idea</b>${esc(ed.brief.idea)}</div>`+
+      `<div class="legend"><span>Tags:</span><span>${badge('confirmed')} official source</span><span>${badge('reported')} news reports</span><span>${badge('approx')} approximate</span><span>${badge('check')} sources disagree</span></div>`;
+  }else if(pg.t==='story'){
+    const s=ed.stories[pg.i];
+    const open=S.settings.cfa||V.cfaOpen[V.date+':'+pg.i];
+    h=meta(`Story ${pg.i+1} of ${ed.stories.length} &middot; ${esc(s.tag)}`,badge(s.conf))+
+      `<h2 class="title">${esc(s.title)}</h2>`+
+      `<h3 class="sec">What happened</h3><ul class="pts">${s.happened.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`+
+      `<div class="means"><b>What it means</b>${esc(s.means)}</div>`+
+      `<p class="watch"><b>Watch next:</b> ${esc(s.watch)}</p>`+
+      (s.note?`<div class="note">${esc(s.note)}</div>`:'')+
+      (s.cfa?`<div class="cfa">${open?'':'<button class="ghost" id="bCfa">Show CFA link</button>'}${open?`<div class="cfabox"><b>CFA link: ${esc(s.cfa.topic)}.</b> ${esc(s.cfa.line)}</div>`:''}</div>`:'')+
+      srcLinks(s.sources);
+  }else if(pg.t==='markets'){
+    h=meta('Markets at a glance',esc(fmt(V.date,{day:'numeric',month:'short'})))+
+      `<h2 class="title">Where things stand</h2>`+
+      ed.markets.map(m=>`<div class="mrow"><span class="nm">${esc(m.name)}</span><span class="vl">${esc(m.value)}</span>${badge(m.conf)}<span class="ds">${esc(m.note)}</span></div>`).join('');
+  }else{
+    h=meta('Words to know',esc(fmt(V.date,{day:'numeric',month:'short'})))+
+      `<h2 class="title">Words from today's news</h2>`+
+      ed.words.map(w=>`<div class="term"><b>${esc(w.term)}.</b> ${esc(w.meaning)}</div>`).join('')+
+      `<h3 class="sec">What to watch next</h3><ul class="pts">${ed.watch.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`;
+  }
+  const last=V.p===total-1;
+  return `<div class="card">${h}<div class="actions"><button class="ghost" id="bPrev" ${V.p===0?'disabled':''}>Previous</button><button class="primary" id="bNext">${last?'Finish':'Next'}</button></div></div>`;
+}
+function grassHtml(){
+  const today=new Date();today.setHours(0,0,0,0);
+  const start=new Date(today);start.setDate(start.getDate()-start.getDay()-21*7);
+  let g='',m='',lastM=-1;
+  for(let w=0;w<22;w++){
+    const wk=new Date(start);wk.setDate(start.getDate()+w*7);
+    m+='<span>'+(wk.getMonth()!==lastM?wk.toLocaleDateString('en-GB',{month:'short'}):'')+'</span>';lastM=wk.getMonth();
+    for(let d=0;d<7;d++){
+      const c=new Date(start);c.setDate(start.getDate()+w*7+d);
+      if(c>today){g+='<i class="g gx"></i>';continue}
+      const k=key(c),r=rec(k);let lv=0;
+      if(r&&r.total)lv=Math.max(1,Math.ceil(r.seen.length/r.total*4));
+      const has=INDEX.indexOf(k)>=0;
+      const tip=fmt(k,{day:'numeric',month:'short',year:'numeric'})+': '+(r&&r.total?r.seen.length+' of '+r.total+' read':(has?'Not read yet':'No edition'));
+      g+=`<button class="g g${lv}${k===key(today)?' now':''}${has?' has':''}" data-d="${k}" title="${esc(tip)}" aria-label="${esc(tip)}"></button>`;
+    }
+  }
+  $('months').innerHTML=m;$('grass').innerHTML=g;
+}
+function render(){
+  if(!V.ed)return;
+  const total=V.pages.length;
+  $('stage').innerHTML=pageHtml();
+  if(V.p<total)markSeen(V.date,V.p,total);
+  $('rows').innerHTML=V.pages.map((p,i)=>{
+    const r=rec(V.date),seen=r&&r.seen.indexOf(i)>=0;
+    return `<button class="row ${seen?'seen':''} ${i===V.p?'cur':''}" data-p="${i}"><span class="n">${i+1}</span><span class="tt"><em>${esc(p.tag)}</em>${esc(p.label)}</span><span class="ck">&#10003;</span></button>`}).join('');
+  const sc=seenCount(V.date);
+  $('sDone').textContent=sc+'/'+total;$('bar').style.width=(sc/total*100)+'%';
+  $('sStreak').textContent=streak();
+  $('sDays').textContent=Object.keys(S.days).filter(isRead).length;
+  grassHtml();
+  $('eds').innerHTML=INDEX.slice().reverse().slice(0,14).map(k=>`<button class="chip ${k===V.date?'cur':''}" data-ed="${k}">${esc(fmt(k,{weekday:'short',day:'numeric',month:'short'}))}</button>`).join('')||'<span class="hint">No editions yet.</span>';
+  try{history.replaceState(null,'','#'+V.date+'/'+(V.p+1))}catch(e){}
+}
+async function openDay(k,p){
+  try{
+    const ed=await loadDay(k);
+    V.date=k;V.ed=ed;V.pages=pagesOf(ed);
+    if(p==null){const r=rec(k);const sn=r?r.seen:[];if(r&&sn.length>=V.pages.length)p=0;else{p=0;while(sn.indexOf(p)>=0&&p<V.pages.length-1)p++}}
+    V.p=Math.max(0,Math.min(p,V.pages.length));
+    render();window.scrollTo({top:0});
+  }catch(e){$('stage').innerHTML='<div class="card"><p>Could not load the edition for '+esc(k)+'.</p></div>'}
+}
+function go(p){V.p=p;render();window.scrollTo({top:0,behavior:'smooth'})}
+document.addEventListener('click',e=>{
+  const t=e.target.closest('button');if(!t)return;
+  if(t.dataset.p!==undefined)return go(+t.dataset.p);
+  if(t.dataset.ed)return openDay(t.dataset.ed,0);
+  if(t.dataset.d&&t.classList.contains('has'))return openDay(t.dataset.d,null);
+  switch(t.id){
+    case 'bNext':return go(V.p+1);
+    case 'bPrev':return go(V.p-1);
+    case 'bBack':return go(0);
+    case 'bCfa':V.cfaOpen[V.date+':'+V.pages[V.p].i]=1;return render();
+    case 'bTheme':{const cur=document.documentElement.dataset.theme||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+      S.settings.theme=cur==='dark'?'light':'dark';applyTheme();save();return}
+    case 'bTest':return testNote();
+    case 'bExport':{save();$('bkBox').innerHTML='<p class="hint">Copy this code and keep it somewhere safe.</p><textarea id="bkT" readonly rows="4"></textarea>';const x=$('bkT');x.value=JSON.stringify(S);x.focus();x.select();return}
+    case 'bImport':$('bkBox').innerHTML='<p class="hint">Paste your backup code here.</p><textarea id="bkI" rows="4"></textarea><button class="ghost" id="bGo">Restore</button>';return;
+    case 'bGo':{try{const x=JSON.parse($('bkI').value);if(!x||!x.days)throw 0;S=Object.assign({days:{},settings:Object.assign({},DEF),notified:''},x);S.settings=Object.assign({},DEF,S.settings);save();applyTheme();syncSettingsUi();$('bkBox').innerHTML='<p class="hint">Restored.</p>';render()}catch(err){$('bkBox').innerHTML+='<p class="hint" style="color:var(--bad)">That is not a valid backup code.</p>'}return}
+  }
+});
+document.addEventListener('keydown',e=>{
+  if(/INPUT|TEXTAREA/.test((e.target||{}).tagName||''))return;
+  if(e.key==='ArrowRight'&&V.p<V.pages.length)go(V.p+1);
+  if(e.key==='ArrowLeft'&&V.p>0)go(V.p-1);
+});
+function applyTheme(){if(S.settings.theme)document.documentElement.dataset.theme=S.settings.theme;else document.documentElement.removeAttribute('data-theme')}
+function syncSettingsUi(){$('cRemind').checked=!!S.settings.remind;$('tRemind').value=S.settings.time;$('cCfa').checked=!!S.settings.cfa}
+$('cCfa').addEventListener('change',e=>{S.settings.cfa=e.target.checked;save();render()});
+
+/* Reminders */
+const hint=t=>{$('rHint').textContent=t};
+async function allow(){
+  if(!('Notification' in window)){hint('This browser does not support notifications.');return false}
+  let p=Notification.permission;if(p==='default')p=await Notification.requestPermission();
+  if(p!=='granted'){hint('Notifications are blocked. Allow them in the site settings of your browser.');return false}
+  return true;
+}
+function pushToSW(){
+  if(!('serviceWorker' in navigator))return;
+  navigator.serviceWorker.ready.then(r=>{if(r.active)r.active.postMessage({type:'settings',remind:S.settings.remind,time:S.settings.time});
+    if(r.periodicSync&&S.settings.remind){r.periodicSync.register('daily-brief',{minInterval:6*3600*1000}).catch(()=>{})}}).catch(()=>{});
+}
+function notify(n){
+  const title='Finance Daily, '+n.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
+  const o={body:'Your daily brief is ready. About 3 minutes.',icon:'icon-192.png',tag:'fd-'+key(n)};
+  if('serviceWorker' in navigator&&navigator.serviceWorker.controller){navigator.serviceWorker.ready.then(r=>r.showNotification(title,o))}
+  else{try{new Notification(title,o)}catch(e){}}
+}
+function testNote(){allow().then(ok=>{if(ok){notify(new Date());hint('Test sent.')}})}
+function tick(){
+  if(!S.settings.remind||!('Notification' in window)||Notification.permission!=='granted')return;
+  const n=new Date(),k=key(n);if(S.notified===k)return;
+  const a=S.settings.time.split(':').map(Number);
+  if(n.getHours()*60+n.getMinutes()>=a[0]*60+a[1]){S.notified=k;save();if(!isRead(k))notify(n)}
+}
+$('cRemind').addEventListener('change',async e=>{
+  if(e.target.checked){const ok=await allow();if(!ok){e.target.checked=false;return}hint('Reminder is on. Works while the browser is open, or when this site is installed as an app.')}
+  S.settings.remind=e.target.checked;save();pushToSW();
+});
+$('tRemind').addEventListener('change',e=>{S.settings.time=e.target.value||'08:00';save();pushToSW()});
+setInterval(tick,30000);
+
+/* Start */
+applyTheme();syncSettingsUi();
+if(location.protocol.indexOf('http')===0&&'serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').then(pushToSW).catch(()=>{})}
+if(!INDEX.length){$('stage').innerHTML='<div class="card"><p>No editions found yet.</p></div>';return}
+const latest=INDEX[INDEX.length-1],tk=key(new Date());
+if(tk>latest){$('notice').textContent='Today ('+fmt(tk,{day:'numeric',month:'short'})+') is not published yet. Showing the latest edition, '+fmt(latest,{day:'numeric',month:'short'})+'.';$('notice').className='notice warn'}
+let startK=latest,startP=null;
+const m=location.hash.match(/^#(\d{4}-\d{2}-\d{2})\/(\d+)$/);
+if(m&&INDEX.indexOf(m[1])>=0){startK=m[1];startP=+m[2]-1}
+openDay(startK,startP).then(tick);
+})();
+</script>
+</body>
+</html>
